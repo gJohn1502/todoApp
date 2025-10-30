@@ -1,0 +1,55 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments :: head('Todos')}"></head>
+<body>
+<div th:replace="~{fragments :: navbar}"></div>
+
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>Todo List</h2>
+    <a class="btn btn-primary" th:href="@{/todos/new}">Add Todo</a>
+  </div>
+
+  <!-- Filter buttons -->
+  <div class="btn-group mb-3">
+    <a class="btn btn-outline-secondary" th:classappend="${filter=='ALL'}?' active':''" th:href="@{/todos(filter='ALL')}">All</a>
+    <a class="btn btn-outline-secondary" th:classappend="${filter=='PENDING'}?' active':''" th:href="@{/todos(filter='PENDING')}">Pending</a>
+    <a class="btn btn-outline-secondary" th:classappend="${filter=='DONE'}?' active':''" th:href="@{/todos(filter='DONE')}">Done</a>
+  </div>
+
+  <table class="table table-striped">
+    <thead>
+    <tr>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Status</th>
+      <th>Created</th>
+      <th>Actions</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="todo : ${todos}">
+      <td th:text="${todo.title}"></td>
+      <td th:text="${todo.description}"></td>
+      <td>
+        <span th:if="${todo.status.name() == 'PENDING'}" class="badge badge-warning">Pending</span>
+        <span th:if="${todo.status.name() == 'DONE'}" class="badge badge-success">Done</span>
+      </td>
+      <td th:text="${#temporals.format(todo.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+      <td>
+        <a th:href="@{|/todos/${todo.id}/edit|}" class="btn btn-sm btn-secondary">Edit</a>
+
+        <form th:action="@{|/todos/${todo.id}/done|}" method="post" style="display:inline" th:if="${todo.status.name() == 'PENDING'}">
+          <button type="submit" class="btn btn-sm btn-success">Mark Done</button>
+        </form>
+
+        <form th:action="@{|/todos/${todo.id}/delete|}" method="post" style="display:inline" onsubmit="return confirm('Delete this todo?');">
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+        </form>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
